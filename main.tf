@@ -184,3 +184,8 @@ resource "aws_cur_report_definition" "report" {
   additional_schema_elements = []
   additional_artifacts       = []
 }
+
+resource "aws_s3_bucket" "cur-report" {
+  provider = aws.virginia
+  bucket   = "tfc-test-zbm-us-east-1"
+}
