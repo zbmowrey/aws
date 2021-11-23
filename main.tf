@@ -182,5 +182,4 @@ resource "aws_cur_report_definition" "report" {
   compression                = "GZIP"
 
   additional_schema_elements = ["RESOURCES"]
-  additional_artifacts       = []
 }
