@@ -1,9 +1,9 @@
 terraform {
   backend "remote" {
-    organization = "zbmowrey-aws"
+    organization = "zbmowrey-cloud-admin"
 
     workspaces {
-      prefix = "aws-"
+      name = "cloud-admin"
     }
   }
 }
@@ -181,6 +181,6 @@ resource "aws_cur_report_definition" "report" {
   format                     = "textORcsv"
   compression                = "GZIP"
 
-  additional_schema_elements = []
+  additional_schema_elements = ["RESOURCES"]
   additional_artifacts       = []
 }
