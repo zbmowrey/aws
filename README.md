@@ -20,10 +20,6 @@ various application environments.
 Any given project repository should include IAC which generates/manages the project's
 dependencies (VPCs, databases, domains, queues, etc).
 
-TODO - Evaluate networking patterns and consider centralizing access. Example:
-```
-- Create a VPC in the root account and attach a nat gateway.
-- Create a VPC in each sub-account and set up VPC peering/transit.
-- Configure all VPCs to use the root account's nat gateway for outbound traffic. 
-- This prevents the need for a separate nat gateway ($$/month) for each subnet, and would allow for better filtering/inspection.
-```
+# Deployment Pipeline
+
+Terraform Cloud monitors the **main** branch of this repository. Changes will be automatically deployed to AWS. 
