@@ -2,38 +2,20 @@
 # Terraform State (s3/dynamo) is my entry point, but I'm also considering
 # uniform IAM roles and other governance-related items.
 
-provider "aws" {
-  alias = "develop"
-  region = var.region
-  assume_role {
-    role_arn = var.develop_assume_role
-  }
-}
-provider "aws" {
-  alias = "staging"
-  region = var.region
-  assume_role {
-    role_arn = var.staging_assume_role
-  }
-}
-provider "aws" {
-  alias = "main"
-  region = var.region
-  assume_role {
-    role_arn = var.main_assume_role
-  }
-}
 
-# Create a dynamo table for terraform locks in each of the environment accounts.
+
+
+
+# Terraform State (s3) and Locks (Dynamo) ################################################
 
 resource "aws_dynamodb_table" "governance-terraform-locks" {
-  hash_key = "LockID"
-  name     = "terraform-locks"
+  hash_key     = "LockID"
+  name         = "terraform-locks"
   attribute {
     name = "LockID"
     type = "S"
   }
-  tags = {
+  tags         = {
     CostCenter = "zbmowrey-global"
   }
   billing_mode = "PAY_PER_REQUEST"
@@ -44,14 +26,14 @@ resource "aws_s3_bucket" "governance-tf-state" {
 }
 
 resource "aws_dynamodb_table" "develop-terraform-locks" {
-  provider = aws.develop
-  hash_key = "LockID"
-  name     = "terraform-locks"
+  provider     = aws.develop
+  hash_key     = "LockID"
+  name         = "terraform-locks"
   attribute {
     name = "LockID"
     type = "S"
   }
-  tags = {
+  tags         = {
     CostCenter = "zbmowrey-global"
   }
   billing_mode = "PAY_PER_REQUEST"
@@ -62,14 +44,14 @@ resource "aws_s3_bucket" "develop-tf-state" {
 }
 
 resource "aws_dynamodb_table" "staging-terraform-locks" {
-  provider = aws.staging
-  hash_key = "LockID"
-  name     = "terraform-locks"
+  provider     = aws.staging
+  hash_key     = "LockID"
+  name         = "terraform-locks"
   attribute {
     name = "LockID"
     type = "S"
   }
-  tags = {
+  tags         = {
     CostCenter = "zbmowrey-global"
   }
   billing_mode = "PAY_PER_REQUEST"
@@ -80,14 +62,14 @@ resource "aws_s3_bucket" "staging-tf-state" {
 }
 
 resource "aws_dynamodb_table" "main-terraform-locks" {
-  provider = aws.main
-  hash_key = "LockID"
-  name     = "terraform-locks"
+  provider     = aws.main
+  hash_key     = "LockID"
+  name         = "terraform-locks"
   attribute {
     name = "LockID"
     type = "S"
   }
-  tags = {
+  tags         = {
     CostCenter = "zbmowrey-global"
   }
   billing_mode = "PAY_PER_REQUEST"
