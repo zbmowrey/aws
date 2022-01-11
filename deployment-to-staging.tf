@@ -19,6 +19,12 @@ resource "aws_iam_role" "staging-allow-deployment" {
         Effect    = "Allow",
         Action    = "sts:AssumeRole",
         Principal = { "AWS" : "arn:aws:iam::${var.deployment_account_id}:root" }
+      },
+      {
+        "Sid": "AllowPassSessionTagsAndTransitive",
+        "Effect": "Allow",
+        "Action": "sts:TagSession",
+        "Principal": {"AWS": "arn:aws:iam::${var.deployment_account_id}:root/deployment"},
       }
     ]
   })
