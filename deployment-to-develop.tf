@@ -21,10 +21,10 @@ resource "aws_iam_role" "develop-allow-deployment" {
         Principal = { "AWS" : "arn:aws:iam::${var.deployment_account_id}:root" }
       },
       {
-        "Sid": "AllowPassSessionTagsAndTransitive",
-        "Effect": "Allow",
-        "Action": "sts:TagSession",
-        "Principal": {"AWS": "arn:aws:iam::${var.deployment_account_id}:root/deployment"},
+        "Sid" : "AllowPassSessionTags",
+        "Effect" : "Allow",
+        "Action" : "sts:TagSession",
+        "Principal" : { "AWS" : "arn:aws:iam::${var.deployment_account_id}:root" },
       }
     ]
   })
@@ -42,4 +42,19 @@ resource "aws_iam_policy_attachment" "develop-deployment-permissions" {
   name       = "Allowed Infrastructure Deployment"
   roles      = [aws_iam_role.develop-allow-deployment.name]
   policy_arn = aws_iam_policy.develop-deployment-permissions.arn
+}
+
+# Github Open ID Connector - Allow Github to directly connect to Develop without using secrets.
+
+module "github-oidc-develop" {
+  providers = {
+    aws = aws.develop
+  }
+  source  = "registry.terraform.io/unfunco/oidc-github/aws"
+  version = "0.4.0"
+
+  github_organisation = "zbmowrey"
+  github_repositories = ["zbmowrey-com", "repsales-net", "tomatowarning-com"]
+  iam_role_name       = "GithubDeploymentRole"
+  attach_admin_policy = true
 }

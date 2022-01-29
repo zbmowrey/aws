@@ -21,10 +21,10 @@ resource "aws_iam_role" "staging-allow-deployment" {
         Principal = { "AWS" : "arn:aws:iam::${var.deployment_account_id}:root" }
       },
       {
-        "Sid": "AllowPassSessionTagsAndTransitive",
-        "Effect": "Allow",
-        "Action": "sts:TagSession",
-        "Principal": {"AWS": "arn:aws:iam::${var.deployment_account_id}:root/deployment"},
+        "Sid" : "AllowPassSessionTags",
+        "Effect" : "Allow",
+        "Action" : "sts:TagSession",
+        "Principal" : { "AWS" : "arn:aws:iam::${var.deployment_account_id}:root" },
       }
     ]
   })
@@ -42,4 +42,19 @@ resource "aws_iam_policy_attachment" "staging-deployment-permissions" {
   name       = "Allowed Infrastructure Deployment"
   roles      = [aws_iam_role.staging-allow-deployment.name]
   policy_arn = aws_iam_policy.staging-deployment-permissions.arn
+}
+
+# Github OIDC Connector
+
+module "github-oidc-staging" {
+  providers = {
+    aws = aws.staging
+  }
+  source  = "registry.terraform.io/unfunco/oidc-github/aws"
+  version = "0.4.0"
+
+  github_organisation = "zbmowrey"
+  github_repositories = ["zbmowrey-com", "repsales-net", "tomatowarning-com"]
+  iam_role_name       = "GithubDeploymentRole"
+  attach_admin_policy = true
 }
