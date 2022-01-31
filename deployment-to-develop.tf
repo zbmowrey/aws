@@ -50,11 +50,35 @@ module "github-oidc-develop" {
   providers = {
     aws = aws.develop
   }
-  source  = "registry.terraform.io/unfunco/oidc-github/aws"
-  version = "0.4.0"
+  source    = "registry.terraform.io/unfunco/oidc-github/aws"
+  version   = "0.4.0"
 
   github_organisation = "zbmowrey"
   github_repositories = ["zbmowrey-com", "repsales-net", "tomatowarning-com"]
   iam_role_name       = "GithubDeploymentRole"
   attach_admin_policy = true
+}
+
+# CloudTrail Trail & Bucket
+
+module "audit-events-cloudtrail-bucket-develop" {
+  providers                = {
+    aws = aws.develop
+  }
+  source                   = "registry.terraform.io/cloudposse/cloudtrail-s3-bucket/aws"
+  acl                      = "log-delivery-write"
+  namespace                = "zbmowrey"
+  environment              = "develop"
+  name                     = "audit-events"
+}
+
+module "audit-events-cloudtrail-develop" {
+  providers                     = {
+    aws = aws.develop
+  }
+  source                        = "registry.terraform.io/cloudposse/cloudtrail/aws"
+  s3_bucket_name                = module.audit-events-cloudtrail-bucket-develop.bucket_id
+  is_multi_region_trail         = true
+  include_global_service_events = true
+  name                          = "audit-events"
 }

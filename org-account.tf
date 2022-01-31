@@ -255,69 +255,6 @@ resource "aws_organizations_account" "root" {
   }
 }
 
-# We use EventBridge to send specific CloudTrail API Calls for all sub-accounts to a specific audit account,
-# where we can fan out based on centralized rules.
-
-resource "aws_cloudwatch_event_bus" "audit-events" {
-  name = "audit-events"
-}
-
-data "aws_iam_policy_document" "audit-events" {
-
-  statement {
-    sid       = "AllowPutEvents"
-    effect    = "Allow"
-    actions   = [
-      "events:PutEvents",
-    ]
-    resources = [
-      aws_cloudwatch_event_bus.audit-events.arn
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = [for acct in aws_organizations_account.app_accounts : acct.id]
-    }
-  }
-
-  statement {
-    sid       = "AllowUpdateRules"
-    effect    = "Allow"
-    actions   = [
-      "events:PutRule",
-      "events:PutTargets",
-      "events:DeleteRule",
-      "events:RemoveTargets",
-      "events:DisableRule",
-      "events:EnableRule",
-      "events:TagResource",
-      "events:UntagResource",
-      "events:DescribeRule",
-      "events:ListTargetsByRule",
-      "events:ListTagsForResource"
-    ]
-    resources = [
-      aws_cloudwatch_event_bus.audit-events.arn
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:PrincipalOrgID"
-      values   = [aws_organizations_organization.root.id]
-    }
-  }
-}
-
-resource "aws_cloudwatch_event_bus_policy" "audit-events" {
-  policy         = data.aws_iam_policy_document.audit-events.json
-  event_bus_name = aws_cloudwatch_event_bus.audit-events.name
-}
-
 ## App Accounts ################################################
 
 resource "aws_organizations_account" "app_accounts" {

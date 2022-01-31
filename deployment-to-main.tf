@@ -57,5 +57,28 @@ module "github-oidc-main" {
   github_repositories = ["zbmowrey-com", "repsales-net", "tomatowarning-com"]
   iam_role_name       = "GithubDeploymentRole"
   attach_admin_policy = true
+}
 
+# CloudTrail Trail & Bucket
+
+module "audit-events-cloudtrail-bucket-main" {
+  providers                = {
+    aws = aws.main
+  }
+  source                   = "registry.terraform.io/cloudposse/cloudtrail-s3-bucket/aws"
+  acl                      = "log-delivery-write"
+  namespace                = "zbmowrey"
+  environment              = "main"
+  name                     = "audit-events"
+}
+
+module "audit-events-cloudtrail-main" {
+  providers                     = {
+    aws = aws.main
+  }
+  source                        = "registry.terraform.io/cloudposse/cloudtrail/aws"
+  s3_bucket_name                = module.audit-events-cloudtrail-bucket-main.bucket_id
+  is_multi_region_trail         = true
+  include_global_service_events = true
+  name                          = "audit-events"
 }

@@ -1,0 +1,48 @@
+#{
+#  "detail-type": [
+#    "AWS API Call via CloudTrail"
+#  ],
+#  "detail": {
+#    "eventName": [
+#      "PurchaseReservedDBInstancesOffering",
+#      "PurchaseReservedInstancesOffering",
+#      "PurchaseReservedCacheNodesOffering",
+#      "PurchaseReservedCapacityOffering",
+#      "PurchaseReservedNodeOffering",
+#      "PurchaseScheduledInstances",
+#      "CreateSavingsPlan"
+#    ]
+#  }
+#}
+
+
+# Can't do cross-account SQS targets with EventBridge, so we need to target
+# an EB bus on the receiving account.
+
+# Development is the SOURCE environment for my events.
+# Staging is the DESTINATION environment.
+
+Resources:
+  DiscountPurchaseEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: "Default Bus Listener for Discount Purchases (RI, SP)"
+      EventBusName: default
+      State: ENABLED
+      EventPattern:
+        detail-type:
+          - "AWS API Call via CloudTrail"
+        detail:
+          eventName:
+            - "PurchaseReservedDBInstancesOffering"
+            - "PurchaseReservedInstancesOffering"
+            - "PurchaseReservedCacheNodesOffering"
+            - "PurchaseReservedCapacityOffering"
+            - "PurchaseReservedNodeOffering"
+            - "PurchaseScheduledInstances"
+            - "CreateSavingsPlan"
+      Targets:
+        - Arn: "arn:aws:sqs:us-east-2:247216695226:EventBridgeNotificationTest"
+          Id: "2WDiscountPurchasesNotificationQueue"
+  
+# Client account must be whitelisted for PUT events on this queue. 
