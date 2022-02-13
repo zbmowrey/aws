@@ -1,6 +1,7 @@
 provider "aws" {
   alias  = "main"
   region = var.region
+  profile = "org"
   default_tags {
     tags = local.default_tags
   }

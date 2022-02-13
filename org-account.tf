@@ -37,14 +37,16 @@ locals {
 # Default provider & "virginia" provider to specify us-east-1.
 
 provider "aws" {
-  region = var.region
+  region  = var.region
+  profile = "org"
   default_tags {
     tags = local.default_tags
   }
 }
 provider "aws" {
-  alias  = "virginia"
-  region = "us-east-1"
+  alias   = "virginia"
+  region  = "us-east-1"
+  profile = "org"
   default_tags {
     tags = local.default_tags
   }
